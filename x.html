@@ -1,0 +1,122 @@
+<style type="text/css">
+.adHeaderDFPMobile, .adFooterDFPMobile {
+ width: [%Width%]px;
+ height: [%Height%]px;
+ z-index:999999;
+ position:fixed;
+ bottom:0;
+ left: 50%;
+ margin-left: -160px;
+}
+</style>
+<script type="text/javascript">
+(function (window) {
+
+ var config = { 'footerClass': 'adFooterDFPMobile' };
+
+ // Apply a style object to a DOM element
+ function setStyles(element, styles) {
+   for (var key in styles) {
+    element.style[key] = styles[key];
+   }
+ }
+
+ // Determine if an element has a class
+ function hasClass(element, cls) {
+   var r = new RegExp('\\b' + cls + '\\b');
+   return r.test(element.className);
+ }
+
+ // Check for Android and iOS support of position: fixed
+ function fixedSupported() {
+   var ua = window.navigator.userAgent;
+   if (ua.match(/(iPhone|iPod|iPad)/)) {
+     return ua.match(/[5-9]_[0-9]/) || false;
+   }
+   if (ua.match(/(Android)/)) {
+     return ua.match(/[3-9]\.[0-9]\.[0-9]/) || ua.match(/2\.[2-3]\.[0-9]/) || false;
+   }
+   return true; // Assume fixed positioning works
+ }
+
+ function applyFixed(element) {
+   var style = {
+   'position': 'fixed'
+   };
+
+   if (hasClass(element, config.headerClass)) {
+     style.top = '0';
+   } else if (hasClass(element, config.footerClass)) {
+     style.bottom = '0';
+   }
+
+   setStyles(element, style);
+  }
+ 
+ function updateBody() {
+   var bodyStyle = { 'margin-bottom': '0' };
+   setStyles(document.body,bodyStyle);
+ }
+ 
+ function hide() {
+    document.getElementById('hideme').style.display = 'none';
+ }
+
+ function reposition(element) {
+   var pos = window.pageYOffset;
+
+   if (hasClass(element, config.footerClass)) {
+     pos += window.innerHeight - element.clientHeight;
+   }
+
+   setStyles(element, {
+       'position': 'absolute',
+       'top': 0,
+       'webkitTransform':
+       'translateY(' + pos + 'px)'
+       });
+ }
+
+ function applyFallback(element) {
+   reposition(element);
+
+   setTimeout(function () {
+       setStyles(element, {
+         '-webkit-transition':
+         '-webkit-transform 150ms ease-out'
+         });
+       }, 0);
+
+   window.addEventListener('scroll', function () {
+       reposition(element);
+       }, false);
+ }
+
+ function initialize() {
+   var d = window.document,
+       headers = d.getElementsByClassName(config.headerClass),
+       footers = d.getElementsByClassName(config.footerClass),
+       header = headers.length > 0 ? headers[0] : null,
+       footer = footers.length > 0 ? footers[0] : null;
+
+   if (fixedSupported()) {
+     if (header) { applyFixed(header); updateBody(); }
+     if (footer) { applyFixed(footer); updateBody(); }
+   } else {
+     if (header) { applyFallback(header); updateBody(); }
+     if (footer) { applyFallback(footer); updateBody(); }
+   }
+ }
+
+ window.addEventListener('load', initialize, false);
+})(window);
+
+ function hideAd() {
+    document.getElementById('hideme').style.display="none";
+ }
+
+</script>
+
+<script type="text/javascript">
+    document.write('<div id="hideme" class="adFooterDFPMobile"><div onClick="hideAd()" style="position:absolute; width:24px; height:24px; right:0; background-image:url(//s0.2mdn.net/ads/richmedia/studio/21515482/23079102_1358876393903_closebutton.png); background-size:100%"></div><a href="%%CLICK_URL_UNESC%%[%ClickThroughURL%]" target="_blank"><img src="%%VIEW_URL_UNESC%%[%ImageFile%]"></a></div>');
+</script>
